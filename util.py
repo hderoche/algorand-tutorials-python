@@ -20,6 +20,8 @@ def wait_for_confirmation(client, txid):
 	@txid: C{string} - The transaction id of the asset
 	"""
 	last_round = client.status().get('lastRound')
+	if last_round == None:
+		last_round = 0
 	while True:
 		txinfo = client.pending_transaction_info(txid)
 		if txinfo.get('round') and txinfo.get('round') > 0:
@@ -27,7 +29,8 @@ def wait_for_confirmation(client, txid):
 			return txinfo
 		else:
 			print("Waiting for confirmation...")
-			last_round += 1
+			print('lastround :', last_round)
+			last_round = last_round + 1
 			client.status_after_block(last_round)
 
 def hash_file_data(filename, return_type="bytes"):

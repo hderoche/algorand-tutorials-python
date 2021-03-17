@@ -9,20 +9,20 @@ from util import add_network_params, sign_and_send, balance_formatter
 from algosdk.v2client import algod
 import json
 
-with open('./secret') as f:
+with open('./secret.json') as f:
   secret = json.load(f)
 
 algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-algod_token = secret.api_key
+algod_token = secret['api_key']
 headers = {
    "X-API-key": algod_token,
 }
-# algod_token = secret.common_api_key
+# algod_token = secret['common_api_key']
 # algod_address = 'https://testnet-algorand.api.purestake.io/ps2'
 # purestake_token = {'X-Api-key': algod_token}
 
 # algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-# algod_token = secret.common_api_key
+# algod_token = secret['common_api_key']
 # headers = {
 #    "X-API-Key": algod_token,
 # }
