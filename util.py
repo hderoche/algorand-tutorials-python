@@ -19,17 +19,16 @@ def wait_for_confirmation(client, txid):
 
 	@txid: C{string} - The transaction id of the asset
 	"""
-	last_round = client.status().get('lastRound')
-	if last_round == None:
-		last_round = 0
+	last_round = client.status().get('last-round')
 	while True:
 		txinfo = client.pending_transaction_info(txid)
+		print(txinfo)
 		if txinfo.get('round') and txinfo.get('round') > 0:
 			print("Transaction {} confirmed in round {}.".format(txid, txinfo.get('round')))
 			return txinfo
 		else:
 			print("Waiting for confirmation...")
-			print('lastround :', last_round)
+			print('txinfo round', txinfo.get('round'))
 			last_round = last_round + 1
 			client.status_after_block(last_round)
 
