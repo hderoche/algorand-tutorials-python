@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 secret.json
+./Sharingan_Triple.png
