@@ -10,6 +10,7 @@ def generate_new_account():
 	private_key, public_address = account.generate_account()
 	passphrase = mnemonic.from_private_key(private_key)
 	print("Address: {}\nPassphrase: \"{}\"".format(public_address, passphrase))
+	return private_key, passphrase
 
 def wait_for_confirmation(client, txid):
 	"""
@@ -45,12 +46,18 @@ def add_network_params(tx_data, client):
 	"""
 	Adds network-related parameters to transaction data.
 	"""
+	print(client)
 	params = client.suggested_params()
-	tx_data["fee"] = params.get("fee")
-	tx_data["first"] = params.get("lastRound")
-	tx_data["last"] = params.get("lastRound") + 1000
-	tx_data["gh"] = params.get("genesishashb64")
-	tx_data["gen"] = params.get("genesisID")
+	gen = params.gen
+	gh = params.gh
+	first_valid_round = params.first
+	last_valid_round = params.last
+	fee = params.min_fee
+	tx_data["fee"] = fee
+	tx_data["first"] = first_valid_round
+	tx_data["last"] = last_valid_round
+	tx_data["gh"] = gh
+	tx_data["gen"] = gen
 	return tx_data
 
 def sign_and_send(txn, passphrase, client):
@@ -61,7 +68,7 @@ def sign_and_send(txn, passphrase, client):
 	private_key = mnemonic.to_private_key(passphrase)
 	stxn = txn.sign(private_key)
 	txid = stxn.transaction.get_txid()
-	client.send_transaction(stxn, headers={'content-type': 'application/x-binary'})
+	client.send_transaction(stxn)
 	txinfo = wait_for_confirmation(client, txid)
 	return txinfo
 

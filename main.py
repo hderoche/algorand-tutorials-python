@@ -1,19 +1,42 @@
 #/usr/bin/python3
 from config import *
-from algosdk import algod
+
 from algosdk import account, mnemonic
 from algosdk.transaction import write_to_file
 from algosdk.transaction import AssetConfigTxn, AssetTransferTxn
 from util import add_network_params, sign_and_send, balance_formatter
 
+from algosdk.v2client import algod
+import json
 
-client = algod.AlgodClient(algod_token, algod_address)
+with open('./secret') as f:
+  secret = json.load(f)
+
+algod_address = "https://testnet-algorand.api.purestake.io/ps2"
+algod_token = secret.api_key
+headers = {
+   "X-API-key": algod_token,
+}
+# algod_token = secret.common_api_key
+# algod_address = 'https://testnet-algorand.api.purestake.io/ps2'
+# purestake_token = {'X-Api-key': algod_token}
+
+# algod_address = "https://testnet-algorand.api.purestake.io/ps2"
+# algod_token = secret.common_api_key
+# headers = {
+#    "X-API-Key": algod_token,
+# }
+
+client = algod.AlgodClient(algod_token, algod_address, headers)
+# client = algod.AlgodClient(algod_token, algod_address, headers=purestake_token);
 
 def create(passphrase=None):
 	"""
 	Returns an unsigned txn object and writes the unsigned transaction
 	object to a file for offline signing. Uses current network params.
 	"""
+	print(headers)
+
 
 	data = add_network_params(asset_details, client)
 	txn = AssetConfigTxn(**data)
@@ -43,7 +66,7 @@ def optin(passphrase=None):
 		print("Opted in to asset ID: {}".format(asset_id))
 		print("Transaction ID Confirmation: {}".format(txinfo.get("tx")))
 	else:
-		write_to_file([txns], "optin.txn")
+		write_to_file([txn], "optin.txn")
 
 def transfer(passphrase=None):
 	"""
@@ -66,7 +89,7 @@ def transfer(passphrase=None):
 			creator_address, receiver_address))
 		print("Transaction ID Confirmation: {}".format(txinfo.get("tx")))
 	else:
-		write_to_file([txns], "transfer.txn")
+		write_to_file([txn], "transfer.txn")
 
 def check_holdings(asset_id, address):
 	"""
